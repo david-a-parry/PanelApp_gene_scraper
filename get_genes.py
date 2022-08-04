@@ -17,6 +17,9 @@ max_attempts = 3
 results_fields = dict(gene_data=['hgnc_symbol', 'gene_name', 'omim_gene',
                                  'hgnc_id', 'biotype'],
                       panel=['id', 'name', 'disease_group'],
+                      mode_of_inheritance=None,
+                      mode_of_pathogenicity=None,
+                      phenotypes=None,
                       confidence_level=None,
                       evidence=None)
 
@@ -52,7 +55,7 @@ def print_results(results, fields):
                         row.append(res[k][j])
         print("\t".join(str(x) for x in row))
     return n
- 
+
 
 def main():
     url = 'https://panelapp.genomicsengland.co.uk/api/v1/genes/?format=json'
@@ -81,4 +84,4 @@ def process_url(url, count=1):
 
 if __name__ == '__main__':
     main()
-    
+
