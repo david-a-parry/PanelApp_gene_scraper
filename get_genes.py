@@ -36,6 +36,28 @@ def get_endpoint(url, attempt=0):
     return r.json()
 
 
+def get_ensembl_information(result):
+    grch37_ver = 0
+    grch37_id = '-'
+    grch38_ver = 0
+    grch38_id = '-'
+    if 'ensembl_genes' in result['gene_data']:
+        edict = result['gene_data']['ensembl_genes']
+        if 'GRch37' in edict:
+            for k, v in edict['GRch37'].items():
+                ver = int(k)
+                if ver >= grch37_ver:
+                    grch37_ver = ver
+                    grch37_id = v['ensembl_id']
+        if 'GRch38' in edict:
+            for k, v in edict['GRch38'].items():
+                ver = int(k)
+                if ver >= grch38_ver:
+                    grch38_ver = ver
+                    grch38_id = v['ensembl_id']
+    return [grch37_ver, grch38_ver, grch37_id, grch38_id]
+
+
 def print_results(results, fields):
     n = 0
     for res in results:
@@ -53,7 +75,8 @@ def print_results(results, fields):
                         row.append(",".join(res[k][j]))
                     else:
                         row.append(res[k][j])
-        print("\t".join(str(x) for x in row))
+        row.extend(get_ensembl_information(res))
+        print("\t".join(str(x).replace('\t', ';') for x in row))
     return n
 
 
@@ -65,6 +88,8 @@ def main():
             header.append(k)
         else:
             header.extend(v)
+    header.extend(['Ensembl_GRCh37_version', 'Ensembl_GRCh38_version',
+                   'Ensembl_GRCh37_ID', 'Ensembl_GRCh38_ID'])
     print("\t".join(header))
     n = process_url(url, count=1)
     logger.info("Finished processing {} gene entities".format(n))
